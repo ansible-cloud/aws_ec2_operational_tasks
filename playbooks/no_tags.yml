@@ -3,10 +3,10 @@
   hosts: localhost
   gather_facts: false
   vars:
-    ec2_region: "{{ your_region| default('eu-central-1') }}"
+    ec2_region: "{{ your_region | default('eu-central-1') }}"
   tasks:
     - name: grab info for un-tagged instances
-      ec2_instance_info:
+      community.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         filters:
           instance-state-name: running
@@ -22,7 +22,7 @@
       run_once: true
 
     - name: Terminate every un-tagged running instance in a region.
-      ec2:
+      community.aws.ec2:
         region: "{{ ec2_region }}"
         state: absent
         instance_ids: "{{ untagged_instances }}"
