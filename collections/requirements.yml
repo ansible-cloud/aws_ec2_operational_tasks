@@ -1,2 +1,5 @@
 collections:
     - name: community.aws
+      source: https://galaxy.ansible.com
+    - name: amazon.aws
+      source: https://galaxy.ansible.com
