@@ -22,7 +22,7 @@
       run_once: true
 
     - name: Terminate every un-tagged running instance in a region.
-      community.aws.ec2:
+      amazon.aws.ec2:
         region: "{{ ec2_region }}"
         state: absent
         instance_ids: "{{ untagged_instances }}"
