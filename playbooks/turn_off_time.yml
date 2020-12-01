@@ -7,10 +7,10 @@
   tasks:
     # retrieve instances for VPC 1
     - name: grab info
-      ec2_instance_info:
+      community.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         filters:
-          "tag:Name": "tqe-gating-*"
+          "tag:Name": "tqe-*"
       register: ec2_node_info
 
     - name: how may hosts captured
@@ -18,42 +18,18 @@
         msg: "There are {{ ec2_node_info.instances | length }} hosts on region {{ ec2_region }}"
       run_once: true
 
-    # - name: print out instance ids
-    #   debug:
-    #     msg: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
-
-    # - name: Terminate every running instance in a region. Use with EXTREME caution.
-    #   community.aws.ec2_instance:
-    #     state: absent
-    #     instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
-
-    - name: Terminate every running instance in a region. Use with EXTREME caution.
-      ec2:
-        region: "{{ ec2_region }}"
-        state: absent
-        instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
-      when: ec2_node_info.instances | length  > 0
-
-    - name: grab info for un-tagged instances
-      ec2_instance_info:
-        region: "{{ ec2_region }}"
-        filters:
-          instance-state-name: running
-      register: ec2_node_info2
-
-    - name: set the untagged to a var
-      set_fact:
-        sean_test: "{{ ec2_node_info2.instances | selectattr('tags', 'equalto', {}) | map(attribute='instance_id') | list }}"
-
-    - name: how may hosts captured
+    - name: host info
       debug:
-        msg: "There are {{ sean_test | length }} un-tagged hosts on region {{ ec2_region }}"
+        msg: "{{ec2_node_info}}"
       run_once: true
 
-    - name: Terminate every un-tagged running instance in a region. Use with EXTREME caution.
-      vars:
-      ec2:
-        region: "{{ ec2_region }}"
-        state: absent
-        instance_ids: "{{ sean_test }}"
-      when: sean_test | length  > 0
+    - name: print out instance ids
+      debug:
+        msg: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }} - {{ ec2_node_info.instances | map(attribute='launch_time') | list }}"
+
+    # - name: Terminate every running instance in a region. Use with EXTREME caution.
+    #   ec2:
+    #     region: "{{ ec2_region }}"
+    #     state: absent
+    #     instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
+    #   when: ec2_node_info.instances | length  > 0
