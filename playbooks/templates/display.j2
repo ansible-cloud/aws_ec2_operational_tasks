@@ -1,0 +1,7 @@
+There are {{ ec2_node_info.instances | length }} AWS instances running for more than {{ kill_time }} minutes on region {{ ec2_region }}
+
+AWS instance_id     Launch_Date                Name
+{% for instance in ec2_node_info.instances %}
+{{ instance.instance_id }} {{ instance.launch_time }} {% if instance.tags.Name is defined %} {{ instance.tags.Name }} {% endif %}
+
+{% endfor %}

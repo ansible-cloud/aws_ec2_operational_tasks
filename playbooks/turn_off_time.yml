@@ -1,42 +1,27 @@
 ---
-- name: this Ansible Playbook will nuke ec2 instances from orbit (turn them off)
+- name: this Ansible Playbook will terminate ec2 instances
   hosts: localhost
   gather_facts: false
   vars:
-    ec2_region: "{{ your_region| default('us-east-1') }}"
+    ec2_region: "{{ your_region | default('us-east-1') }}"
+    kill_time: "{{ your_kill_time | default('121') }}"
   tasks:
     # retrieve instances for VPC 1
     - name: grab info
       community.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
-        uptime: 10200
+        uptime: "{{ kill_time }}"
         filters:
           instance-state-name: [ "running" ]
-          # "tag:Name": "tqe-*"
       register: ec2_node_info
 
-    - name: how may hosts captured
+    - name: diplay AWS uptime results
       debug:
-        msg: "There are {{ ec2_node_info.instances | length }} hosts on region {{ ec2_region }}"
-      run_once: true
+        msg: "{{ lookup('template', 'templates/display.j2') }}"
 
-    # - name: host info
-    #   debug:
-    #     msg: "{{ec2_node_info}}"
-    #   run_once: true
-
-    - name: print out instance ids
-      debug:
-        msg: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }} - {{ ec2_node_info.instances | map(attribute='launch_time') | list }}"
-
-    - name: print out names
-      debug:
-        msg: "{{ ec2_node_info.instances | map(attribute='tags.Name') | list }}"
-
-
-    # - name: Terminate every running instance in a region. Use with EXTREME caution.
-    #   ec2:
-    #     region: "{{ ec2_region }}"
-    #     state: absent
-    #     instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
-    #   when: ec2_node_info.instances | length  > 0
+    - name: Terminate every running running more than killtime
+      ec2:
+        region: "{{ ec2_region }}"
+        state: absent
+        instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
+      when: ec2_node_info.instances | length  > 0
