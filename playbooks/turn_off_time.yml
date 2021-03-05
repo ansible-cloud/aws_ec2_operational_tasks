@@ -3,14 +3,16 @@
   hosts: localhost
   gather_facts: false
   vars:
-    ec2_region: "{{ your_region| default('eu-central-1') }}"
+    ec2_region: "{{ your_region| default('us-east-1') }}"
   tasks:
     # retrieve instances for VPC 1
     - name: grab info
       community.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
+        uptime: 10200
         filters:
-          "tag:Name": "tqe-*"
+          instance-state-name: [ "running" ]
+          # "tag:Name": "tqe-*"
       register: ec2_node_info
 
     - name: how may hosts captured
@@ -18,14 +20,19 @@
         msg: "There are {{ ec2_node_info.instances | length }} hosts on region {{ ec2_region }}"
       run_once: true
 
-    - name: host info
-      debug:
-        msg: "{{ec2_node_info}}"
-      run_once: true
+    # - name: host info
+    #   debug:
+    #     msg: "{{ec2_node_info}}"
+    #   run_once: true
 
     - name: print out instance ids
       debug:
         msg: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }} - {{ ec2_node_info.instances | map(attribute='launch_time') | list }}"
+
+    - name: print out names
+      debug:
+        msg: "{{ ec2_node_info.instances | map(attribute='tags.Name') | list }}"
+
 
     # - name: Terminate every running instance in a region. Use with EXTREME caution.
     #   ec2:
