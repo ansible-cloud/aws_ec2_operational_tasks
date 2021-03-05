@@ -13,6 +13,7 @@
         uptime: "{{ kill_time }}"
         filters:
           instance-state-name: [ "running" ]
+          "tag:AWS_USERNAME": spredzy
       register: ec2_node_info
 
     - name: diplay AWS uptime results
