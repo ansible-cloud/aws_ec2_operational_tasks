@@ -13,7 +13,7 @@
         uptime: "{{ kill_time }}"
         filters:
           instance-state-name: [ "running" ]
-          "tag:AWS_USERNAME": spredzy
+          "tag:ansible-workshops": true
       register: ec2_node_info
 
     - name: diplay AWS uptime results
