@@ -14,15 +14,15 @@
 
     - name: set the untagged to a var
       set_fact:
-        untagged_instances: "{{ ec2_node_info.instances | selectattr('tags', 'equalto', {}) | map(attribute='instance_id') | list }}"
+        missing_tag: "{{ ec2_node_info.instances | selectattr('tags.owner', 'undefined') | map(attribute='instance_id') | list }}"
 
     - name: diplay AWS missing tag results
       debug:
-        msg: "{{ lookup('template', 'templates/no_tags.j2') }}"
+        msg: "{{ lookup('template', 'templates/missing_tag.j2') }}"
 
-    - name: turn off (state stopped) every un-tagged running instance in a region.
-      amazon.aws.ec2:
-        region: "{{ ec2_region }}"
-        state: stopped
-        instance_ids: "{{ untagged_instances }}"
-      when: untagged_instances | length  > 0
+    # - name: Terminate every un-tagged running instance in a region.
+    #   amazon.aws.ec2:
+    #     region: "{{ ec2_region }}"
+    #     state: absent
+    #     instance_ids: "{{ untagged_instances }}"
+    #   when: untagged_instances | length  > 0
