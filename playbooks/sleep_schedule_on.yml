@@ -1,0 +1,34 @@
+---
+- name: this Ansible Playbook will terminate ec2 instances
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ec2_region: "{{ your_region | default('us-east-1') }}"
+  tasks:
+    # retrieve instances for VPC 1
+    - name: grab info
+      community.aws.ec2_instance_info:
+        region: "{{ ec2_region }}"
+        filters:
+          instance-state-name: [ "stopped" ]
+          "tag:sleep_schedule": true
+      register: ec2_node_info
+
+    - name: display sleep_schedule devices for humans
+      debug:
+        msg: "{{ lookup('template', 'templates/sleep_schedule.j2') }}"
+
+    - name: set fact for ec2 module
+      set_fact:
+        shutoff_instances: "{{ lookup('template', 'templates/sleep_schedule_list.j2') }}"
+
+    - name: display sleep_schedule devices for robots
+      debug:
+        msg: "{{ shutoff_instances }}"
+
+    - name: turn on sleepy instances
+      ec2:
+        region: "{{ ec2_region }}"
+        state: running
+        instance_ids: "{{ shutoff_instances }}"
+      when: shutoff_instances | length  > 0
