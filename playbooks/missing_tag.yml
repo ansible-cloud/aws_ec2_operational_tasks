@@ -20,9 +20,9 @@
       debug:
         msg: "{{ lookup('template', 'templates/missing_tag.j2') }}"
 
-    # - name: Terminate every un-tagged running instance in a region.
-    #   amazon.aws.ec2:
-    #     region: "{{ ec2_region }}"
-    #     state: absent
-    #     instance_ids: "{{ untagged_instances }}"
-    #   when: untagged_instances | length  > 0
+    - name: Terminate every un-tagged running instance in a region.
+      amazon.aws.ec2:
+        region: "{{ ec2_region }}"
+        state: stopped
+        instance_ids: "{{ untagged_instances }}"
+      when: untagged_instances | length  > 0
