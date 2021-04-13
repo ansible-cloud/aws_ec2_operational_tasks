@@ -23,6 +23,6 @@
     - name: Terminate every running running more than killtime
       ec2:
         region: "{{ ec2_region }}"
-        state: absent
+        state: stopped
         instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
       when: ec2_node_info.instances | length  > 0
