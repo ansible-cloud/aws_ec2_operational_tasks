@@ -1,2 +1,3 @@
-# aws_nuke_from_orbit
-This Ansible Project will destroy AWS ec2 instances from orbit
+# AWS EC2 Operational Tasks
+
+This Ansible Project showcase multiple AWS (Amazon Web Services) operational tasks fully automated. 
