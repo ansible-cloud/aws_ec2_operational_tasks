@@ -1,5 +1,5 @@
 ---
-- name: this Ansible Playbook will terminate un-tagged instances
+- name: this Ansible Playbook will stop un-tagged instances
   hosts: localhost
   gather_facts: false
   vars:
@@ -20,7 +20,7 @@
       debug:
         msg: "{{ lookup('template', 'templates/missing_tag.j2') }}"
 
-    - name: Terminate every un-tagged running instance in a region.
+    - name: stop every un-tagged running instance in a region.
       amazon.aws.ec2:
         region: "{{ ec2_region }}"
         state: stopped
