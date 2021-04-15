@@ -86,6 +86,11 @@ This Ansible Playbook will retrieve all instances from the specified region `us-
 
 ![ansible demo logo](images/Ansible-Demo-Logo.png)
 
-This project is maintained by Red Hat.  For more information on Ansible Automation please visit [https://www.ansible.com/](https://www.ansible.com/)
+This project is maintained by Red Hat.  
 
-Please consider subscribing to us on YouTube: [https://youtube.com/ansibleautomation](https://youtube.com/ansibleautomation)
+- For more information on Ansible Automation please visit
+[https://www.ansible.com/](https://www.ansible.com/)
+- For more Ansible Automation Platform demos, please visit
+[https://github.com/ansible/product-demos](https://github.com/ansible/product-demos)
+- Please consider subscribing to us on YouTube: 
+[https://youtube.com/ansibleautomation](https://youtube.com/AnsibleAutomation)
