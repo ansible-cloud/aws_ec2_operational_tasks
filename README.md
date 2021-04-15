@@ -4,6 +4,16 @@ This Ansible Project showcase multiple AWS (Amazon Web Services) operational tas
 
 An operational tasks is a routine task an operator (cloud administer) has to do outside of provisioning and deprovisioning resources.  Declarative automation (such as AWS CloudFormation templates) are great until someone manually, or some tool outside of CloudFormation starts interacting with the public cloud.  There is always use cases for imperative repeatable tasks that operators are doing manually.
 
+**Table of Contents**
+* [Glossary of AWS terms](#glossary-of-aws-terms)
+* [Ansible Playbook Examples](#ansible-playbook-examples)
+   * [Retrieve and Stop](#retrieve-and-stop)
+   * [Turn long-running instances off](#turn-long-running-instances-off)
+   * [Turn untagged instances off](#turn-untagged-instances-off)
+   * [Retrieve instances without a specific tag](#retrieve-instances-without-a-specific-tag)
+   * [Put instances to sleep](#put-instances-to-sleep)
+   * [Wake up sleepy instances](#wake-up-sleepy-instances)
+
 # Glossary of AWS terms
 
 **ec2** - Amazon Elastic Compute Cloud, Secure, resizable compute capacity in the cloud.
@@ -92,5 +102,5 @@ This project is maintained by Red Hat.
 [https://www.ansible.com/](https://www.ansible.com/)
 - For more Ansible Automation Platform demos, please visit
 [https://github.com/ansible/product-demos](https://github.com/ansible/product-demos)
-- Please consider subscribing to us on YouTube: 
+- Please consider subscribing to us on YouTube:
 [https://youtube.com/ansibleautomation](https://youtube.com/AnsibleAutomation)
