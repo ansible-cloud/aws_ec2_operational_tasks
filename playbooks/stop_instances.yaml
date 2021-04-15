@@ -1,0 +1,19 @@
+---
+- name: this Ansible Playbook will terminate un-tagged instances
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ec2_region: "{{ your_region | default('us-west-1') }}"
+  tasks:
+    - name: grab info for un-tagged instances
+      community.aws.ec2_instance_info:
+        region: "{{ ec2_region }}"
+        filters:
+          instance-state-name: running
+      register: ec2_node_info
+
+    - name: turn off (state stopped) every un-tagged running instance in a region.
+      amazon.aws.ec2:
+        region: "{{ ec2_region }}"
+        state: stopped
+        instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"
