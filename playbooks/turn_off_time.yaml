@@ -1,5 +1,5 @@
 ---
-- name: this Ansible Playbook will terminate ec2 instances
+- name: this Ansible Playbook will stop ec2 instances over killtime
   hosts: localhost
   gather_facts: false
   vars:
