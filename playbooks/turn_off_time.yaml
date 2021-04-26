@@ -20,7 +20,7 @@
       debug:
         msg: "{{ lookup('template', 'templates/display.j2') }}"
 
-    - name: Terminate every running running more than killtime
+    - name: stop every running running more than killtime
       ec2:
         region: "{{ ec2_region }}"
         state: stopped
