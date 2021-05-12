@@ -29,6 +29,7 @@
 
     - name: find all subnets associated with VPC
       amazon.aws.ec2_vpc_subnet_info:
+        region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
       loop: "{{ ec2_node_info.results }}"
