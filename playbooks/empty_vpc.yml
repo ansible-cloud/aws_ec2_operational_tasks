@@ -35,10 +35,6 @@
       register: all_subnets
       when: item.instances | length == 0
 
-    # - name: list all subnets for empty VPCs
-    #   debug:
-    #     msg: "{{ all_subnets | to_nice_yaml }}"
-
     # - name: find all subnets associated with VPC
     #   debug:
     #     msg: "{{ item.1.subnet_id | to_nice_yaml }}"
@@ -56,17 +52,7 @@
         - "{{ all_subnets.results }}"
         - subnets
 
-    - name: Delete subnets
-      ec2_vpc_subnet:
-        region: "{{ ec2_region }}"
-        vpc_id: "{{ item.1.vpc_id }}"
-        cidr: "{{ item.1.cidr_block }}"
-        state: absent
-      with_subelements:
-        - "{{ all_subnets.results }}"
-        - subnets
-
-    # Gather information about all security groups in a specific VPC
+    - name: Gather information about all security groups
     - amazon.aws.ec2_group_info:
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
@@ -74,7 +60,7 @@
       register: all_sg
       when: item.instances | length == 0
 
-    # - name: list all sg for empty VPCs
+    # - name: debug list all sg for empty VPCs
     #   debug:
     #     msg: "{{ all_sg | to_nice_yaml }}"
 
