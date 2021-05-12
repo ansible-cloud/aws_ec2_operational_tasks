@@ -1,0 +1,18 @@
+- name: "Query for existing vpc by name ({{ aws_vpc_delete.name }})"
+  ec2_vpc_net_info:
+    profile: "{{ aws_vpc_delete.profile }}"
+    region: "{{ aws_vpc_delete.region }}"
+    filters:
+      "tag:Name": "{{ aws_vpc_delete.name }}"
+  register: vpc_info
+
+- fail:
+    msg: "No vpc could be located by the name {{ aws_vpc_delete.name }}"
+  when: vpc_info.vpcs | length == 0
+
+- import_tasks: "route_tables.yaml"
+- import_tasks: "peering.yaml"
+- import_tasks: "nat_gateway.yaml"
+- import_tasks: "internet_gateway.yaml"
+- import_tasks: "subnets.yaml"
+- import_tasks: "vpc.yaml"

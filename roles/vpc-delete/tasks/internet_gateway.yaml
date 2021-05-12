@@ -1,0 +1,7 @@
+- name: "Delete internet gateway"
+  ec2_vpc_igw:
+    profile: "{{ aws_vpc_delete.profile }}"
+    region: "{{ aws_vpc_delete.region }}"
+    vpc_id: "{{ item.vpc_id }}"
+    state: "absent"
+  with_items: "{{ vpc_info.vpcs }}"

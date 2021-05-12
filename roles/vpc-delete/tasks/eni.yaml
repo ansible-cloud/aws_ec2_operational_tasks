@@ -1,0 +1,19 @@
+---
+- name: Get ENI
+  ec2_eni_info:
+    region: "{{ ec2_region }}"
+    filters:
+      "vpc-id": '{{ ec2_vpc_id }}'
+  register: dangling_eni_info
+
+- name: debug dangling_eni_info
+  debug:
+    var: dangling_eni_info
+  when: debug_teardown
+
+- name: Delete dangling ENIs from for {{ ec2_name_prefix }}-vpc
+  ec2_eni:
+    region: "{{ ec2_region }}"
+    eni_id: "{{item['id']}}"
+    state: absent
+  loop: "{{dangling_eni_info['network_interfaces']}}"
