@@ -1,0 +1,108 @@
+---
+- name: this Ansible Playbook will terminate empty VPCs
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ec2_region: "{{ your_region | default('us-east-1') }}"
+  tasks:
+    - amazon.aws.ec2_vpc_net_info:
+        region: "{{ ec2_region }}"
+        filters:
+          "tag:Name": "*tqe*"
+      register: all_vpcs
+
+    - name: grab info instances in VPCs
+      community.aws.ec2_instance_info:
+        region: "{{ ec2_region }}"
+        filters:
+          vpc-id: "{{ item.vpc_id }}"
+      register: ec2_node_info
+      loop: '{{ all_vpcs.vpcs }}'
+
+    # - name: list out data model
+    #   debug:
+    #     msg: "{{ ec2_node_info | to_nice_yaml }}"
+
+    - name: diplay AWS missing tag results
+      debug:
+        msg: "{{ lookup('template', 'templates/vpc_instances.j2') }}"
+
+    - name: find all subnets associated with VPC
+      amazon.aws.ec2_vpc_subnet_info:
+        filters:
+          vpc-id: "{{ item.item.vpc_id }}"
+      loop: "{{ ec2_node_info.results }}"
+      register: all_subnets
+      when: item.instances | length == 0
+
+    # - name: list all subnets for empty VPCs
+    #   debug:
+    #     msg: "{{ all_subnets | to_nice_yaml }}"
+
+    # - name: find all subnets associated with VPC
+    #   debug:
+    #     msg: "{{ item.1.subnet_id | to_nice_yaml }}"
+    #   with_subelements:
+    #     - "{{ all_subnets.results }}"
+    #     - subnets
+
+    - name: Delete subnets
+      ec2_vpc_subnet:
+        region: "{{ ec2_region }}"
+        vpc_id: "{{ item.1.vpc_id }}"
+        cidr: "{{ item.1.cidr_block }}"
+        state: absent
+      with_subelements:
+        - "{{ all_subnets.results }}"
+        - subnets
+
+    - name: Delete subnets
+      ec2_vpc_subnet:
+        region: "{{ ec2_region }}"
+        vpc_id: "{{ item.1.vpc_id }}"
+        cidr: "{{ item.1.cidr_block }}"
+        state: absent
+      with_subelements:
+        - "{{ all_subnets.results }}"
+        - subnets
+
+    # Gather information about all security groups in a specific VPC
+    - amazon.aws.ec2_group_info:
+        filters:
+          vpc-id: "{{ item.item.vpc_id }}"
+      loop: "{{ ec2_node_info.results }}"
+      register: all_sg
+      when: item.instances | length == 0
+
+    # - name: list all sg for empty VPCs
+    #   debug:
+    #     msg: "{{ all_sg | to_nice_yaml }}"
+
+    - name: "Delete group by its id"
+      amazon.aws.ec2_group:
+        region: "{{ ec2_region }}"
+        group_id: "{{ item.1.group_id }}"
+        state: absent
+      with_subelements:
+        - "{{ all_sg.results }}"
+        - security_groups
+      when: item.1.group_name != "default"
+
+    # - name: debug delete AWS VPC
+    #   debug:
+    #     msg:
+    #       - "name: {{ item.item.tags.Name }}"
+    #       - "cidr_block: {{ item.item.cidr_block }}"
+    #       - "region: {{ ec2_region }}"
+    #       - "state: absent"
+    #       - "instances: {{ item.instances | length }}"
+    #   loop: "{{ ec2_node_info.results }}"
+
+    - name: delete AWS VPC
+      ec2_vpc_net:
+        name: "{{ item.item.tags.Name }}"
+        cidr_block: "{{ item.item.cidr_block }}"
+        region: "{{ ec2_region }}"
+        state: absent
+      loop: "{{ ec2_node_info.results }}"
+      when: item.instances | length == 0

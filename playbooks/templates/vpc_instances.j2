@@ -1,0 +1,6 @@
+There are {{ all_vpcs.vpcs | length }} AWS VPCs with filter *tqe* {{ ec2_region }}
+
+VPC ID                  # of Instances            VPC Name
+{% for ec2_instances in ec2_node_info.results %}
+{{ ec2_instances.item.id }}     {{ ec2_instances.instances | length }}                      {{ ec2_instances.item.tags.Name | default("No Name") }}
+{% endfor %}
