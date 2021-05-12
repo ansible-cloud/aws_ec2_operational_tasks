@@ -105,7 +105,7 @@
       when: item.instances | length == 0
 
     - name: delete all igw
-      ec2_vpc_igw:
+      community.aws.ec2_vpc_igw:
         region: "{{ ec2_region }}"
         vpc_id: "{{ item.1.vpc_id }}"
         state: absent
