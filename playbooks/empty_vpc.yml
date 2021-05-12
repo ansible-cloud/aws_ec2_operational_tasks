@@ -27,6 +27,28 @@
       debug:
         msg: "{{ lookup('template', 'templates/vpc_instances.j2') }}"
 
+    - name: Gather information about all security groups
+      amazon.aws.ec2_group_info:
+        filters:
+          vpc-id: "{{ item.item.vpc_id }}"
+      loop: "{{ ec2_node_info.results }}"
+      register: all_sg
+      when: item.instances | length == 0
+
+    # - name: debug list all sg for empty VPCs
+    #   debug:
+    #     msg: "{{ all_sg | to_nice_yaml }}"
+
+    - name: "Delete group by its id"
+      amazon.aws.ec2_group:
+        region: "{{ ec2_region }}"
+        group_id: "{{ item.1.group_id }}"
+        state: absent
+      with_subelements:
+        - "{{ all_sg.results }}"
+        - security_groups
+      when: item.1.group_name != "default"
+      
     - name: find all subnets associated with VPC
       amazon.aws.ec2_vpc_subnet_info:
         region: "{{ ec2_region }}"
@@ -52,28 +74,6 @@
       with_subelements:
         - "{{ all_subnets.results }}"
         - subnets
-
-    - name: Gather information about all security groups
-      amazon.aws.ec2_group_info:
-        filters:
-          vpc-id: "{{ item.item.vpc_id }}"
-      loop: "{{ ec2_node_info.results }}"
-      register: all_sg
-      when: item.instances | length == 0
-
-    # - name: debug list all sg for empty VPCs
-    #   debug:
-    #     msg: "{{ all_sg | to_nice_yaml }}"
-
-    - name: "Delete group by its id"
-      amazon.aws.ec2_group:
-        region: "{{ ec2_region }}"
-        group_id: "{{ item.1.group_id }}"
-        state: absent
-      with_subelements:
-        - "{{ all_sg.results }}"
-        - security_groups
-      when: item.1.group_name != "default"
 
     # - name: debug delete AWS VPC
     #   debug:
