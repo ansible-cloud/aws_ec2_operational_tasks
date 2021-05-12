@@ -28,17 +28,16 @@
         msg: "{{ lookup('template', 'templates/vpc_instances.j2') }}"
 
     - name: Gather information about all eni
-      ec2_eni_info:
+      amazon.aws.ec2_eni_info:
         region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
-      register: dangling_eni_info
       loop: "{{ ec2_node_info.results }}"
       register: all_eni
       when: item.instances | length == 0
 
     - name: Delete dangling ENIs from for {{ ec2_name_prefix }}-vpc
-      ec2_eni:
+      amazon.aws.ec2_eni:
         region: "{{ ec2_region }}"
         eni_id: "{{item.1['id']}}"
         state: absent
@@ -122,6 +121,31 @@
     #       - "state: absent"
     #       - "instances: {{ item.instances | length }}"
     #   loop: "{{ ec2_node_info.results }}"
+
+    - name: grab route information for {{ ec2_name_prefix }} on {{ ec2_region }}
+      community.aws.ec2_vpc_route_table_info:
+        region: "{{ ec2_region }}"
+        filters:
+          vpc-id: "{{ item.item.vpc_id }}"
+      register: route_table_facts
+      loop: "{{ ec2_node_info.results }}"
+      register: all_route_table
+      when: item.instances | length == 0
+
+    - name: debug route table
+      debug:
+        msg: "{{ all_route_table }}"
+
+    - name: vpc public subnet route table is deleted
+      community.aws.ec2_vpc_route_table:
+        region: "{{ ec2_region }}"
+        route_table_id: "{{item.1.id}}"
+        lookup: id
+        vpc_id: "{{ item.1.vpc_id }}"
+        state: absent
+      with_subelements:
+        - "{{ all_route_table.results }}"
+        - route_tables
 
     - name: delete AWS VPC
       ec2_vpc_net:
