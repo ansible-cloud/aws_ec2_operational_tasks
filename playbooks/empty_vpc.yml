@@ -53,7 +53,7 @@
         - subnets
 
     - name: Gather information about all security groups
-    - amazon.aws.ec2_group_info:
+      amazon.aws.ec2_group_info:
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
       loop: "{{ ec2_node_info.results }}"
