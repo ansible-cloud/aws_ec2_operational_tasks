@@ -29,6 +29,7 @@
 
     - name: Gather information about all security groups
       amazon.aws.ec2_group_info:
+        region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
       loop: "{{ ec2_node_info.results }}"
@@ -48,7 +49,7 @@
         - "{{ all_sg.results }}"
         - security_groups
       when: item.1.group_name != "default"
-      
+
     - name: find all subnets associated with VPC
       amazon.aws.ec2_vpc_subnet_info:
         region: "{{ ec2_region }}"
