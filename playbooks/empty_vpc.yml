@@ -127,7 +127,7 @@
         region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
-      register: route_table_facts
+          association.main: "false"
       loop: "{{ ec2_node_info.results }}"
       register: all_route_table
       when: item.instances | length == 0
