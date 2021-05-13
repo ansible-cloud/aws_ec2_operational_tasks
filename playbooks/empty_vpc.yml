@@ -4,11 +4,12 @@
   gather_facts: false
   vars:
     ec2_region: "{{ your_region | default('us-east-1') }}"
+    filter_tag: "{{ your_tag | default('*tqe*')}}"
   tasks:
     - amazon.aws.ec2_vpc_net_info:
         region: "{{ ec2_region }}"
         filters:
-          "tag:Name": "*tqe*"
+          "tag:Name": "{{ filter_tag }}"
       register: all_vpcs
 
     - name: grab info instances in VPCs
@@ -18,10 +19,6 @@
           vpc-id: "{{ item.vpc_id }}"
       register: ec2_node_info
       loop: '{{ all_vpcs.vpcs }}'
-
-    # - name: list out data model
-    #   debug:
-    #     msg: "{{ ec2_node_info | to_nice_yaml }}"
 
     - name: diplay AWS missing tag results
       debug:
@@ -77,13 +74,6 @@
       register: all_subnets
       when: item.instances | length == 0
 
-    # - name: find all subnets associated with VPC
-    #   debug:
-    #     msg: "{{ item.1.subnet_id | to_nice_yaml }}"
-    #   with_subelements:
-    #     - "{{ all_subnets.results }}"
-    #     - subnets
-
     - name: Delete subnets
       ec2_vpc_subnet:
         region: "{{ ec2_region }}"
@@ -94,47 +84,26 @@
         - "{{ all_subnets.results }}"
         - subnets
 
-    - name: find all igw associated with empty VPCs
-      community.aws.ec2_vpc_igw_info:
+    - name: "Delete internet gateway"
+      ec2_vpc_igw:
         region: "{{ ec2_region }}"
-        filters:
-          attachment.vpc-id: "{{ item.item.vpc_id }}"
+        vpc_id: "{{ item.item.vpc_id }}"
+        state: "absent"
       loop: "{{ ec2_node_info.results }}"
-      register: all_igw
       when: item.instances | length == 0
-
-    - name: delete all igw
-      community.aws.ec2_vpc_igw:
-        region: "{{ ec2_region }}"
-        vpc_id: "{{ item.1.vpc_id }}"
-        state: absent
-      with_subelements:
-        - "{{ all_subnets.results }}"
-        - subnets
-
-    # - name: debug delete AWS VPC
-    #   debug:
-    #     msg:
-    #       - "name: {{ item.item.tags.Name }}"
-    #       - "cidr_block: {{ item.item.cidr_block }}"
-    #       - "region: {{ ec2_region }}"
-    #       - "state: absent"
-    #       - "instances: {{ item.instances | length }}"
-    #   loop: "{{ ec2_node_info.results }}"
 
     - name: grab route information for {{ ec2_name_prefix }} on {{ ec2_region }}
       community.aws.ec2_vpc_route_table_info:
         region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
-          association.main: "false"
       loop: "{{ ec2_node_info.results }}"
       register: all_route_table
       when: item.instances | length == 0
 
     - name: debug route table
       debug:
-        msg: "{{ all_route_table }}"
+        msg: "{{ all_route_table | to_nice_yaml }}"
 
     - name: vpc public subnet route table is deleted
       community.aws.ec2_vpc_route_table:
@@ -146,6 +115,7 @@
       with_subelements:
         - "{{ all_route_table.results }}"
         - route_tables
+      when: item.1.associations | length == 0 or not item.1.associations[0].main
 
     - name: delete AWS VPC
       ec2_vpc_net:
