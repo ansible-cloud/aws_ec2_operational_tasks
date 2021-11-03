@@ -3,6 +3,6 @@ There are {{ ec2_node_info.instances | length  }} AWS instances with sleep_sched
 
 AWS instance_id     Launch_Date                Name                    Elastic IP
 {% for instance in ec2_node_info.instances %}
-{{ instance.instance_id }} {{ instance.launch_time }} {% if instance.tags.Name is defined %} {{ instance.tags.Name }} {% endif %} {% if "amazon" not in instance.network_interfaces[0].association.ip_owner_id %} true {{ shutoff_instances.append( instance.instance_id ) }}  {% else %} false {% endif %}
+{{ instance.instance_id }} {{ instance.launch_time }} {% if instance.tags.Name is defined %} {{ instance.tags.Name }} {% endif %} {% if instance.network_interfaces[0].association is defined %}{% if "amazon" not in instance.network_interfaces[0].association.ip_owner_id %} true {{ shutoff_instances.append( instance.instance_id ) }}  {% else %} false {% endif %}{% endif %}
 
 {% endfor %}

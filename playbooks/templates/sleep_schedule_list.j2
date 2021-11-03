@@ -1,6 +1,6 @@
 {%- set shutoff_instances = [] -%}
 {%- for instance in ec2_node_info.instances -%}
-{%- if "amazon" not in instance.network_interfaces[0].association.ip_owner_id -%} {{ shutoff_instances.append( instance.instance_id ) }}  {%- else -%} {%- endif -%}
+{%- if instance.network_interfaces[0].association is defined -%}{%- if "amazon" not in instance.network_interfaces[0].association.ip_owner_id -%} {{ shutoff_instances.append( instance.instance_id ) }}  {%- else -%} {%- endif -%}{%- endif -%}
 
 {%- endfor -%}
 {{ shutoff_instances }}

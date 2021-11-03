@@ -1,9 +1,9 @@
 ---
-- name: this Ansible Playbook will terminate ec2 instances
+- name: this playbook will turn off ec2 instances with sleep_schedule tag
   hosts: localhost
   gather_facts: false
   vars:
-    ec2_region: "{{ your_region | default('us-east-1') }}"
+    ec2_region: "{{ your_region | default('us-east-2') }}"
   tasks:
     # retrieve instances for VPC 1
     - name: grab info
@@ -13,7 +13,6 @@
           instance-state-name: [ "running" ]
           "tag:sleep_schedule": true
       register: ec2_node_info
-
 
     - name: display sleep_schedule devices
       debug:

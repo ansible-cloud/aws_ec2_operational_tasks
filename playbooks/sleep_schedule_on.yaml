@@ -1,5 +1,5 @@
 ---
-- name: this Ansible Playbook will terminate ec2 instances
+- name: this Ansible Playbook will turn on ec2 instances with sleep_schedule tag
   hosts: localhost
   gather_facts: false
   vars:
