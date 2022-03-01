@@ -13,7 +13,7 @@
       register: all_vpcs
 
     - name: grab info instances in VPCs
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.vpc_id }}"
@@ -93,7 +93,7 @@
       when: item.instances | length == 0
 
     - name: grab route information for {{ ec2_name_prefix }} on {{ ec2_region }}
-      community.aws.ec2_vpc_route_table_info:
+      amazon.aws.ec2_vpc_route_table_info:
         region: "{{ ec2_region }}"
         filters:
           vpc-id: "{{ item.item.vpc_id }}"
@@ -106,7 +106,7 @@
         msg: "{{ all_route_table | to_nice_yaml }}"
 
     - name: vpc public subnet route table is deleted
-      community.aws.ec2_vpc_route_table:
+      amazon.aws.ec2_vpc_route_table:
         region: "{{ ec2_region }}"
         route_table_id: "{{item.1.id}}"
         lookup: id

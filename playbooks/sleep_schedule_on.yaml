@@ -7,7 +7,7 @@
   tasks:
     # retrieve instances for VPC 1
     - name: grab info
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         filters:
           instance-state-name: [ "stopped" ]

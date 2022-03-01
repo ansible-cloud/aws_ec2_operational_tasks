@@ -6,7 +6,7 @@
     ec2_region: "{{ your_region | default('us-west-1') }}"
   tasks:
     - name: grab info for un-tagged instances
-      community.aws.ec2_instance_info:
+      amazon.aws.ec2_instance_info:
         region: "{{ ec2_region }}"
         filters:
           instance-state-name: running
