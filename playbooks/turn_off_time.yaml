@@ -21,7 +21,7 @@
         msg: "{{ lookup('template', 'templates/display.j2') }}"
 
     - name: stop every running running more than killtime
-      ec2:
+      amazon.aws.ec2_instance:
         region: "{{ ec2_region }}"
         state: stopped
         instance_ids: "{{ ec2_node_info.instances | map(attribute='instance_id') | list }}"

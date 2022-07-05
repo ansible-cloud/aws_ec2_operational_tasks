@@ -27,7 +27,7 @@
         msg: "{{ shutoff_instances }}"
 
     - name: turn off sleepy instances
-      ec2:
+      amazon.aws.ec2_instance:
         region: "{{ ec2_region }}"
         state: stopped
         instance_ids: "{{ shutoff_instances }}"

@@ -21,7 +21,7 @@
         msg: "{{ lookup('template', 'templates/missing_tag.j2') }}"
 
     - name: stop every un-tagged running instance in a region.
-      amazon.aws.ec2:
+      amazon.aws.ec2_instance:
         region: "{{ ec2_region }}"
         state: stopped
         instance_ids: "{{ missing_tag }}"
